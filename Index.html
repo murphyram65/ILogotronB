@@ -1,10 +1,1219 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Mon site</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Logotron - Générateur de mots savants</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --neon-green: #39ff14;
+  --neon-pink: #ff2d78;
+  --neon-cyan: #00f5ff;
+  --neon-orange: #ff6b00;
+  --deep-space: #0a0c12;
+  --space-blue: #0e121f;
+  --panel-bg: rgba(0, 245, 255, 0.05);
+  --panel-border: rgba(0, 245, 255, 0.25);
+  --glow-green: 0 0 8px #39ff14, 0 0 20px rgba(57,255,20,0.3);
+  --glow-pink: 0 0 8px #ff2d78, 0 0 20px rgba(255,45,120,0.4);
+  --glow-cyan: 0 0 8px #00f5ff, 0 0 20px rgba(0,245,255,0.3);
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Exo 2', sans-serif;
+  background: linear-gradient(135deg, #05070c 0%, #0a0f1a 50%, #03050a 100%);
+  min-height: 100vh;
+  color: #d0eaff;
+  position: relative;
+  padding-bottom: 40px;
+}
+
+/* Fond étoilé amélioré */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(2px 2px at 15% 25%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(2px 2px at 35% 12%, rgba(0,245,255,0.8) 0%, transparent 100%),
+    radial-gradient(3px 3px at 52% 35%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(2px 2px at 78% 8%, rgba(255,45,120,0.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 88% 28%, rgba(57,255,20,0.7) 0%, transparent 100%),
+    radial-gradient(3px 3px at 42% 55%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(2px 2px at 65% 72%, rgba(0,245,255,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 25% 85%, rgba(255,45,120,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 92% 45%, rgba(57,255,20,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 5% 60%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 48% 78%, rgba(0,245,255,0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 72% 55%, rgba(255,107,0,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 8% 35%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 95% 82%, rgba(255,45,120,0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 58% 92%, rgba(57,255,20,0.5) 0%, transparent 100%);
+  background-size: 300px 300px;
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: 0;
+  animation: starsFloat 120s linear infinite;
+}
+
+@keyframes starsFloat {
+  0% { background-position: 0 0; }
+  100% { background-position: 300px 300px; }
+}
+
+/* Lignes de balayage */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.2) 2px,
+    rgba(0, 0, 0, 0.2) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ===== HEADER ===== */
+header {
+  text-align: center;
+  padding: 32px 0 20px;
+  position: relative;
+}
+
+.header-beam {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  box-shadow: var(--glow-cyan);
+}
+
+.title-wrap {
+  display: inline-block;
+  position: relative;
+}
+
+header h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--neon-cyan);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  text-shadow: var(--glow-cyan), 0 0 40px rgba(0,245,255,0.2);
+  animation: titlePulse 3s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { text-shadow: 0 0 8px #00f5ff, 0 0 20px rgba(0,245,255,0.3); }
+  50% { text-shadow: 0 0 14px #00f5ff, 0 0 40px rgba(0,245,255,0.6), 0 0 70px rgba(0,245,255,0.2); }
+}
+
+.title-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--neon-pink);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 4px;
+  text-shadow: var(--glow-pink);
+  opacity: 0.85;
+}
+
+.corner-deco {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+}
+.corner-deco.tl { top: 0; left: 0; border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); }
+.corner-deco.tr { top: 0; right: 0; border-top: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); }
+.corner-deco.bl { bottom: 0; left: 0; border-bottom: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); }
+.corner-deco.br { bottom: 0; right: 0; border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); }
+
+/* ===== DIVIDER ===== */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 20px;
+}
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0.4;
+}
+.divider-icon {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--neon-cyan);
+  opacity: 0.6;
+  letter-spacing: 2px;
+}
+
+/* ===== MAIN CARD ===== */
+.main-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.main-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0.6;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(0,245,255,0.08);
+  background: rgba(0,245,255,0.03);
+}
+
+.card-header-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  box-shadow: var(--glow-green);
+  animation: blink 1.8s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.card-header-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--neon-cyan);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.card-body {
+  padding: 22px 16px 24px;
+}
+
+/* ===== WORD DISPLAY ===== */
+.word-display {
+  text-align: center;
+  margin-bottom: 18px;
+  padding: 18px 12px 14px;
+  position: relative;
+  background: rgba(0,0,0,0.4);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 45, 120, 0.25);
+}
+
+.word-display::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
+  opacity: 0.5;
+}
+
+.word-main {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--neon-pink);
+  letter-spacing: 2px;
+  text-shadow: var(--glow-pink);
+  line-height: 1.1;
+  word-break: break-all;
+  animation: wordAppear 0.4s ease-out;
+}
+
+@keyframes wordAppear {
+  from { opacity: 0; transform: scale(0.9) translateY(-8px); filter: blur(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+
+.word-defs {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.def-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--neon-orange);
+  background: rgba(255,107,0,0.12);
+  border: 1px solid rgba(255,107,0,0.4);
+  border-radius: 2px;
+  padding: 3px 8px;
+  text-shadow: 0 0 6px rgba(255,107,0,0.5);
+  animation: wordAppear 0.5s ease-out 0.1s both;
+}
+
+.def-separator {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: rgba(200,232,255,0.4);
+  align-self: center;
+}
+
+/* ===== ROOTS SECTION ===== */
+.roots-label-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+.root-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
+  opacity: 0.55;
+}
+
+.roots-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.root-card {
+  flex: 1;
+  background: rgba(0, 245, 255, 0.06);
+  border: 1px solid rgba(0,245,255,0.2);
+  border-radius: 3px;
+  padding: 12px 10px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.root-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0.3;
+}
+
+.root-word {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--neon-green);
+  text-shadow: var(--glow-green);
+  display: block;
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+.root-def {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  color: rgba(200,232,255,0.7);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* Combo definition */
+.combo-section {
+  margin-top: 14px;
+  padding: 12px;
+  background: rgba(57,255,20,0.05);
+  border: 1px solid rgba(57,255,20,0.2);
+  border-radius: 3px;
+  position: relative;
+}
+
+.combo-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 2px;
+  color: var(--neon-green);
+  opacity: 0.6;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.combo-text {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.88rem;
+  color: var(--neon-green);
+  text-shadow: 0 0 6px rgba(57,255,20,0.4);
+  font-weight: 600;
+  line-height: 1.5;
+  animation: wordAppear 0.5s ease-out 0.15s both;
+}
+
+.combo-text-alt {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(57,255,20,0.5);
+  font-style: italic;
+  margin-top: 3px;
+  animation: wordAppear 0.5s ease-out 0.2s both;
+}
+
+/* ===== BUTTON ===== */
+.btn-wrap {
+  padding: 20px 0 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-nouveau {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #03050a;
+  background: var(--neon-cyan);
+  border: none;
+  border-radius: 3px;
+  padding: 14px 36px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+  box-shadow: 0 0 12px rgba(0,245,255,0.5), 0 0 30px rgba(0,245,255,0.2);
+  -webkit-tap-highlight-color: transparent;
+  min-width: 200px;
+}
+
+.btn-nouveau::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.4s;
+}
+
+.btn-nouveau:active::before {
+  left: 100%;
+}
+
+.btn-nouveau:active {
+  transform: scale(0.96);
+  box-shadow: 0 0 6px rgba(0,245,255,0.8), 0 0 20px rgba(0,245,255,0.4);
+}
+
+.btn-nouveau::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.3);
+  pointer-events: none;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  text-align: center;
+  padding: 16px 0 8px;
+  position: relative;
+  z-index: 2;
+}
+
+footer span {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: rgba(200,232,255,0.3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Glitch effect on title hover */
+header h1:hover {
+  animation: glitch 0.3s steps(2) forwards, titlePulse 3s ease-in-out infinite 0.3s;
+}
+
+@keyframes glitch {
+  0% { text-shadow: 0 0 8px #00f5ff, 3px 0 0 rgba(255,45,120,0.7), -3px 0 0 rgba(57,255,20,0.7); }
+  25% { text-shadow: 0 0 8px #00f5ff, -3px 0 0 rgba(255,45,120,0.7), 3px 0 0 rgba(57,255,20,0.7); }
+  50% { text-shadow: 0 0 8px #00f5ff, 2px 2px 0 rgba(255,45,120,0.7), -2px -2px 0 rgba(57,255,20,0.7); }
+  100% { text-shadow: 0 0 14px #00f5ff, 0 0 40px rgba(0,245,255,0.6); }
+}
+
+/* Floating particles */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 50%;
+  animation: floatUp linear infinite;
+  opacity: 0;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+/* HUD corner element */
+.hud-corner {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  opacity: 0.4;
+}
+
+.hud-line {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem;
+  color: var(--neon-cyan);
+  letter-spacing: 1px;
+}
+
+/* Effet de lueur au survol */
+.root-card:hover {
+  border-color: rgba(0,245,255,0.5);
+  background: rgba(0,245,255,0.1);
+  transition: all 0.2s;
+}
+</style>
+
 </head>
 <body>
-  <h1>🚀 Mon micro-site est en ligne !</h1>
+
+<div class="container">
+
+  <header>
+    <div class="header-beam"></div>
+    <div class="title-wrap">
+      <div class="corner-deco tl"></div>
+      <div class="corner-deco tr"></div>
+      <div class="corner-deco bl"></div>
+      <div class="corner-deco br"></div>
+      <h1>Logotron</h1>
+      <div class="title-sub">De Jean-Pierre Petit</div>
+    </div>
+  </header>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-icon">◈ LEXICAL ENGINE ◈</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="main-card">
+    <div class="card-header">
+      <div class="card-header-dot"></div>
+      <div class="card-header-label">Mot Généré</div>
+    </div>
+    <div class="card-body">
+
+      <div class="word-display">
+        <div class="word-main" id="mot-display"></div>
+        <div class="word-defs">
+          <span class="def-tag" id="def-prefix"></span>
+          <span class="def-separator">+</span>
+          <span class="def-tag" id="def-suffix"></span>
+        </div>
+      </div>
+
+      <div class="roots-label-row">
+        <span class="root-label">⬡ Préfixe</span>
+        <span class="root-label">Suffixe ⬡</span>
+      </div>
+
+      <div class="roots-row">
+        <div class="root-card">
+          <span class="root-word" id="prefix-word"></span>
+          <span class="root-def" id="prefix-def"></span>
+        </div>
+        <div class="root-card">
+          <span class="root-word" id="suffix-word"></span>
+          <span class="root-def" id="suffix-def"></span>
+        </div>
+      </div>
+
+      <div class="combo-section">
+        <div class="combo-label">▸ Définition combinée</div>
+        <div class="combo-text" id="combo-1"></div>
+        <div class="combo-text-alt" id="combo-2"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="btn-wrap">
+    <button class="btn-nouveau" onclick="genererAuto()">◈ Nouveau Mot ◈</button>
+  </div>
+
+</div>
+
+<footer>
+  <span>Logotron — De Jean-Pierre Petit</span>
+</footer>
+
+<div class="hud-corner">
+  <div class="hud-line">SYS: LEXGEN-9</div>
+  <div class="hud-line" id="hud-count">LOAD: 747×747</div>
+  <div class="hud-line">STATUS: ONLINE</div>
+</div>
+
+<script>
+// =====================================================================
+// BASE DE DONNÉES : Préfixes et Suffixes grecs/latins
+// =====================================================================
+const prefixes = [
+  { mot: "a", def: "sans" },
+  { mot: "poly", def: "multiple" },
+  { mot: "bio", def: "la vie" },
+  { mot: "hydro", def: "l'eau" },
+  { mot: "micro", def: "petit(e)" },
+  { mot: "mono", def: "unique" },
+  { mot: "di", def: "double" },
+  { mot: "dys", def: "le trouble" },
+  { mot: "photo", def: "la lumière" },
+  { mot: "hypo", def: "inférieur(e)" },
+  { mot: "épi", def: "sur" },
+  { mot: "radio", def: "le rayonnement" },
+  { mot: "hyper", def: "audessus" },
+  { mot: "para", def: "à coté" },
+  { mot: "géo", def: "la terre" },
+  { mot: "iso", def: "identique" },
+  { mot: "péri", def: "autour" },
+  { mot: "anti", def: "contre" },
+  { mot: "électro", def: "l'ambre > l'électricité" },
+  { mot: "hétéro", def: "l'autre" },
+  { mot: "psycho", def: "l'âme" },
+  { mot: "zoo", def: "l'animal" },
+  { mot: "tri", def: "triple" },
+  { mot: "neuro", def: "les nerfs" },
+  { mot: "cyto", def: "la cellule" },
+  { mot: "auto", def: "de soimême" },
+  { mot: "thermo", def: "la chaleur" },
+  { mot: "dia", def: "à travers" },
+  { mot: "ortho", def: "droit(e)" },
+  { mot: "endo", def: "à l'intérieur" },
+  { mot: "homo", def: "identique" },
+  { mot: "pro", def: "devant / en faveur de / à la place de" },
+  { mot: "an", def: "sans" },
+  { mot: "syn", def: "avec" },
+  { mot: "myo", def: "la souris > le muscle" },
+  { mot: "cardio", def: "le cœur" },
+  { mot: "méta", def: "audelà / après" },
+  { mot: "anthropo", def: "l'homme" },
+  { mot: "télé", def: "à distance" },
+  { mot: "aéro", def: "l'air" },
+  { mot: "ostéo", def: "l'os" },
+  { mot: "hémi", def: "à moitié" },
+  { mot: "hémo", def: "le sang" },
+  { mot: "phyto", def: "le végétal" },
+  { mot: "ana", def: "l'autre / à travers / à nouveau / vers le haut" },
+  { mot: "pyro", def: "le feu" },
+  { mot: "litho", def: "la pierre" },
+  { mot: "macro", def: "grand(e)" },
+  { mot: "néo", def: "nouveau (velle)" },
+  { mot: "gastro", def: "le ventre" },
+  { mot: "patho", def: "la maladie" },
+  { mot: "paléo", def: "l'ancien(ne)" },
+  { mot: "blast", def: "le germe" },
+  { mot: "hélio", def: "le soleil" },
+  { mot: "leuco", def: "blanc(he)" },
+  { mot: "bi", def: "double" },
+  { mot: "méso", def: "le milieu" },
+  { mot: "physio", def: "le corps" },
+  { mot: "con", def: "avec" },
+  { mot: "dé", def: "enlever" },
+  { mot: "par", def: "à travers / de part en part / terminer / intense" },
+  { mot: "éco", def: "la maison > l'écologie / l'économie" },
+  { mot: "socio", def: "partagé(e)" },
+  { mot: "chrono", def: "le temps" },
+  { mot: "cysto", def: "la vessie > la vésicule" },
+  { mot: "astro", def: "le ciel" },
+  { mot: "stéréo", def: "solide > robuste / le relief" },
+  { mot: "eu", def: "bien / véritable" },
+  { mot: "exo", def: "en dehors" },
+  { mot: "cyclo", def: "la roue" },
+  { mot: "angio", def: "le vaisseau" },
+  { mot: "encéphalo", def: "le cerveau" },
+  { mot: "érythro", def: "rouge" },
+  { mot: "hémato", def: "le sang" },
+  { mot: "immuno", def: "la défense" },
+  { mot: "lipo", def: "la graisse" },
+  { mot: "morpho", def: "la forme" },
+  { mot: "apo", def: "hors" },
+  { mot: "entéro", def: "l'intestin" },
+  { mot: "myélo", def: "la moelle" },
+  { mot: "oxy", def: "aigu(e) > l'oxygène" },
+  { mot: "tétra", def: "quatre" },
+  { mot: "co", def: "avec" },
+  { mot: "crypto", def: "caché(e)" },
+  { mot: "allo", def: "l'autre" },
+  { mot: "chromo", def: "la couleur" },
+  { mot: "cryo", def: "froid(e)" },
+  { mot: "lympho", def: "liquide" },
+  { mot: "chromat", def: "la couleur" },
+  { mot: "holo", def: "entier(e)" },
+  { mot: "pan", def: "de tout" },
+  { mot: "pneumo", def: "le poumon" },
+  { mot: "psych", def: "l'âme" },
+  { mot: "cata", def: "vers le bas" },
+  { mot: "pseudo", def: "faux > presque" },
+  { mot: "ethno", def: "le peuple" },
+  { mot: "fibro", def: "à l'extrémité > la fibre" },
+  { mot: "hépato", def: "le foie" },
+  { mot: "histo", def: "la trame / le tissu" },
+  { mot: "phono", def: "la voix" },
+  { mot: "rhino", def: "le nez" },
+  { mot: "techno", def: "la technique" },
+  { mot: "typo", def: "l'empreinte" },
+  { mot: "écho", def: "l'écho" },
+  { mot: "magnéto", def: "l'aimant" },
+  { mot: "pharmaco", def: "le médicament" },
+  { mot: "théo", def: "le divin" },
+  { mot: "tricho", def: "le poil" },
+  { mot: "chondro", def: "le cartilage" },
+  { mot: "cyst", def: "la vessie > la vésicule" },
+  { mot: "dermato", def: "la peau" },
+  { mot: "dermo", def: "la peau" },
+  { mot: "halo", def: "le sel / la mer" },
+  { mot: "néphro", def: "le rein" },
+  { mot: "oligo", def: "parcimonieux (euse)" },
+  { mot: "philo", def: "l'amour" },
+  { mot: "uro", def: "l'urine" },
+  { mot: "multi", def: "plusieurs" },
+  { mot: "organo", def: "l'organe" },
+  { mot: "proto", def: "premier(ère)" },
+  { mot: "topo", def: "le lieu" },
+  { mot: "tox", def: "toxique" },
+  { mot: "acro", def: "élevé(e) / extrême" },
+  { mot: "chlor", def: "chloré(e)" },
+  { mot: "cholé", def: "la bile" },
+  { mot: "métall", def: "le métal" },
+  { mot: "métro", def: "la matrice" },
+  { mot: "pré", def: "avant" },
+  { mot: "card", def: "le cœur" }
+];
+
+// Version complete des suffixes
+
+const suffixes = [
+  { mot: "logie", def: "étude" },
+  { mot: "ique", def: "à propos" },
+  { mot: "graphie", def: "écriture" },
+  { mot: "logique", def: "étude" },
+  { mot: "mètre", def: "mesureur" },
+  { mot: "ite", def: "inflammation" },
+  { mot: "métrie", def: "mesure" },
+  { mot: "gène", def: "générateur / origine" },
+  { mot: "logue", def: "spécialiste / discours" },
+  { mot: "graphique", def: "écriture" },
+  { mot: "graphe", def: "qui écrit" },
+  { mot: "gramme", def: "écriture" },
+  { mot: "ïde", def: "apparence" },
+  { mot: "métrique", def: "mesurage" },
+  { mot: "pathie", def: "maladie" },
+  { mot: "thérapie", def: "médecine" },
+  { mot: "logiste", def: "spécialiste" },
+  { mot: "genèse", def: "création" },
+  { mot: "lyse", def: "décomposition" },
+  { mot: "ome", def: "tumeur" },
+  { mot: "scopie", def: "examen" },
+  { mot: "scope", def: "visionneuse" },
+  { mot: "tomie", def: "découpe" },
+  { mot: "ation", def: "action" },
+  { mot: "phile", def: "amoureux" },
+  { mot: "phore", def: "porteur" },
+  { mot: "cèle", def: "tumeur / hernie" },
+  { mot: "ptère", def: "aile" },
+  { mot: "génique", def: "développement" },
+  { mot: "lithe", def: "pierre" },
+  { mot: "pode", def: "pied" },
+  { mot: "iste", def: "adepte / spécialiste" },
+  { mot: "cyte", def: "cellule" },
+  { mot: "trope", def: "orientation" },
+  { mot: "émie", def: "sang" },
+  { mot: "génie", def: "développement" },
+  { mot: "plastie", def: "façonnement" },
+  { mot: "isme", def: "doctrine / état / profession" },
+  { mot: "phage", def: "mangeur" },
+  { mot: "céphale", def: "tête" },
+  { mot: "ide", def: "apparence" },
+  { mot: "tome", def: "coupure" },
+  { mot: "nomie", def: "loi" },
+  { mot: "phobie", def: "aversion" },
+  { mot: "algie", def: "douleur" },
+  { mot: "carpe", def: "poignet" },
+  { mot: "morphe", def: "forme" },
+  { mot: "phylle", def: "feuille" },
+  { mot: "some", def: "corps" },
+  { mot: "chimie", def: "chimie" },
+  { mot: "manie", def: "obsession" },
+  { mot: "statique", def: "arrêt" },
+  { mot: "type", def: "empreinte" },
+  { mot: "mère", def: "partie" },
+  { mot: "phonie", def: "voix" },
+  { mot: "philie", def: "amour" },
+  { mot: "thèque", def: "rangement" },
+  { mot: "forme", def: "forme" },
+  { mot: "mancie", def: "prédiction" },
+  { mot: "scopique", def: "examen" },
+  { mot: "stome", def: "bouche" },
+  { mot: "fère", def: "porter" },
+  { mot: "phone", def: "voix" },
+  { mot: "rrhée", def: "écoulement" },
+  { mot: "lytique", def: "décomposition" },
+  { mot: "ectomie", def: "ablation" },
+  { mot: "blaste", def: "germe" },
+  { mot: "euse", def: "agente / qualité" },
+  { mot: "odonte", def: "dent" },
+  { mot: "gamie", def: "mariage" },
+  { mot: "opsie", def: "vision" },
+  { mot: "pathique", def: "maladie" },
+  { mot: "trophie", def: "nourriture / croissance" },
+  { mot: "culture", def: "culture" },
+  { mot: "génétique", def: "création" },
+  { mot: "plasie", def: "façonnement" },
+  { mot: "chimique", def: "chimique" },
+  { mot: "cide", def: "qui tue" },
+  { mot: "dynamique", def: "mouvement" },
+  { mot: "pexie", def: "fixation" },
+  { mot: "phyte", def: "végétal" },
+  { mot: "stomie", def: "bouche" },
+  { mot: "gyne", def: "femme / femelle" },
+  { mot: "morphisme", def: "forme" },
+  { mot: "nomique", def: "loi" },
+  { mot: "onyme", def: "nom" },
+  { mot: "plastique", def: "façonnement" },
+  { mot: "thermie", def: "chaleur" },
+  { mot: "gnosie", def: "connaissance" },
+  { mot: "phonique", def: "voix" },
+  { mot: "style", def: "colonne" },
+  { mot: "technique", def: "technique" },
+  { mot: "zoaire", def: "animal" },
+  { mot: "centrique", def: "centré" },
+  { mot: "derme", def: "peau" },
+  { mot: "èdre", def: "base > face" },
+  { mot: "eux", def: "agent / qualité" },
+  { mot: "taxie", def: "disposition" },
+  { mot: "tropisme", def: "attirance" },
+  { mot: "chrome", def: "couleur" },
+  { mot: "chromie", def: "couleur" },
+  { mot: "esthésie", def: "sensation" },
+  { mot: "gone", def: "procréation" },
+  { mot: "tomique", def: "découpe" },
+  { mot: "urie", def: "urine" },
+  { mot: "cratie", def: "gouvernance" },
+  { mot: "eur", def: "agent / qualité" },
+  { mot: "nome", def: "loi" },
+  { mot: "céphalie", def: "tête" },
+  { mot: "rragie", def: "écoulement" },
+  { mot: "sphérique", def: "sphère" },
+  { mot: "cole", def: "cultiver / habiter / rendre un culte" },
+  { mot: "game", def: "marié" },
+  { mot: "mane", def: "maniaque" },
+  { mot: "phobe", def: "qui a horreur" },
+  { mot: "plégie", def: "paralysie" },
+  { mot: "site", def: "nourriture" },
+  { mot: "cratique", def: "gouvernance" },
+  { mot: "dermique", def: "peau" },
+  { mot: "drome", def: "piste" },
+  { mot: "logisme", def: "étude" },
+  { mot: "thérapique", def: "médecine" },
+  { mot: "lithique", def: "pierre" },
+  { mot: "pénie", def: "pauvreté" },
+  { mot: "poïèse", def: "création" },
+  { mot: "ateur", def: "agent" },
+  { mot: "électrique", def: "électrique" },
+  { mot: "nymie", def: "nom" },
+  { mot: "ptose", def: "chute" },
+  { mot: "stat", def: "maintien" },
+  { mot: "able", def: "qui peut être" },
+  { mot: "cinétique", def: "mouvement" },
+  { mot: "gonie", def: "procréation" },
+  { mot: "labe", def: "prise" },
+  { mot: "morphie", def: "forme" },
+  { mot: "pole", def: "ville" },
+  { mot: "rraphie", def: "suture" },
+  { mot: "zoïque", def: "animal" },
+  { mot: "dermie", def: "peau" },
+  { mot: "fuge", def: "fuite" },
+  { mot: "gnathe", def: "mâchoire" },
+  { mot: "magnétique", def: "aimantation" },
+  { mot: "magnétisme", def: "aimantation" },
+  { mot: "stase", def: "arrêt" },
+  { mot: "technie", def: "technique" },
+  { mot: "valent", def: "valeur / sens / capacité / aspect" },
+  { mot: "anthe", def: "fleur" },
+  { mot: "bie", def: "vie" },
+  { mot: "centre", def: "centre" },
+  { mot: "crate", def: "gouverneur" },
+  { mot: "culteur", def: "cultivateur" },
+  { mot: "cyste", def: "vessie > vésicule" },
+  { mot: "grade", def: "marche" },
+  { mot: "mélie", def: "membre" },
+  { mot: "saure", def: "lézard" },
+  { mot: "therme", def: "chaleur" },
+  { mot: "algique", def: "douleur" },
+  { mot: "mycose", def: "champignon" },
+  { mot: "page", def: "attache" },
+  { mot: "phylaxie", def: "protection" },
+  { mot: "tropie", def: "attirance" },
+  { mot: "chrone", def: "temps" },
+  { mot: "glyphe", def: "gravure" },
+  { mot: "iatrie", def: "médecin" },
+  { mot: "leptique", def: "attaque" },
+  { mot: "nose", def: "maladie" },
+  { mot: "somie", def: "corps" },
+  { mot: "synthèse", def: "composition" },
+  { mot: "carde", def: "cœur" },
+  { mot: "ducteur", def: "qui conduit" },
+  { mot: "gée", def: "terre" },
+  { mot: "kinésie", def: "mouvement" },
+  { mot: "odontie", def: "dent" },
+  { mot: "trophique", def: "nourriture / croissance" },
+  { mot: "tropique", def: "attirance" },
+  { mot: "bole", def: "jet" },
+  { mot: "ectasie", def: "dilatation" },
+  { mot: "génésie", def: "création" },
+  { mot: "spermie", def: "semence" },
+  { mot: "xyle", def: "bois" },
+  { mot: "agogue", def: "meneur" },
+  { mot: "hydrique", def: "eau" },
+  { mot: "mégalie", def: "grandeur" },
+  { mot: "phane", def: "apparition" },
+  { mot: "physe", def: "production / croissance" },
+  { mot: "trophe", def: "nourriture / croissance" },
+  { mot: "chronisme", def: "temporalité" },
+  { mot: "dactylie", def: "doigt" },
+  { mot: "ductrice", def: "qui conduit" },
+  { mot: "némie", def: "le sang" },
+  { mot: "phasie", def: "dire" },
+  { mot: "phorie", def: "porteur" },
+  { mot: "zoïde", def: "animal" },
+  { mot: "bolisme", def: "jet" },
+  { mot: "iatre", def: "médecin" },
+  { mot: "nécrose", def: "mort" },
+  { mot: "pare", def: "qui engendre" },
+  { mot: "vore", def: "dévoreur" },
+  { mot: "bolique", def: "jet" },
+  { mot: "cinésie", def: "mouvement" },
+  { mot: "clase", def: "cassure" },
+  { mot: "mimétique", def: "imitation" },
+  { mot: "morphose", def: "forme" },
+  { mot: "phrénie", def: "esprit" },
+  { mot: "urgie", def: "travail" },
+  { mot: "algésie", def: "douleur" },
+  { mot: "atrice", def: "agente" },
+  { mot: "ergie", def: "travail" },
+  { mot: "génisme", def: "développement" },
+  { mot: "pause", def: "cessation" },
+  { mot: "pédie", def: "pied" },
+  { mot: "port", def: "passage" },
+  { mot: "praxie", def: "action" },
+  { mot: "tude", def: "qualité / état" },
+  { mot: "xène", def: "hôte" },
+  { mot: "zyme", def: "levain > enzyme" },
+  { mot: "agogique", def: "guidage" },
+  { mot: "crine", def: "sécrétion" },
+  { mot: "cule", def: "petit(e)" },
+  { mot: "lepsie", def: "attaque" },
+  { mot: "natal", def: "naissance" },
+  { mot: "phène", def: "apparition" },
+  { mot: "urgique", def: "travail" },
+  { mot: "voque", def: "sens" },
+  { mot: "acousie", def: "audition" },
+  { mot: "agogie", def: "guidage" },
+  { mot: "coccie", def: "graine > bactérie" },
+  { mot: "coccique", def: "graine > bactérie" },
+  { mot: "enaire", def: "agé(e)" },
+  { mot: "fixe", def: "fixer" },
+  { mot: "hélie", def: "soleil" },
+  { mot: "asthénie", def: "faiblesse" },
+  { mot: "chore", def: "emplacement / dissémination" },
+  { mot: "doxe", def: "opinion" },
+  { mot: "dyne", def: "énergie" },
+  { mot: "formisme", def: "forme" },
+  { mot: "gnose", def: "connaissance" },
+  { mot: "lexie", def: "lecture" },
+  { mot: "mégalique", def: "grandeur" },
+  { mot: "sophe", def: "sage" },
+  { mot: "sophique", def: "sagesse" },
+  { mot: "anthrope", def: "homme" },
+  { mot: "anthropie", def: "homme" },
+  { mot: "bare", def: "poids / pression" },
+  { mot: "bionte", def: "vivre" },
+  { mot: "cénose", def: "communauté" },
+  { mot: "luminique", def: "lumière" },
+  { mot: "nyme", def: "nom" },
+  { mot: "anthropique", def: "homme" },
+  { mot: "centèse", def: "piqure" },
+  { mot: "didyme", def: "double" },
+  { mot: "somatique", def: "corps" },
+  { mot: "urge", def: "travailleur" },
+  { mot: "urgiste", def: "travailleur" },
+  { mot: "âtre", def: "un peu" },
+  { mot: "strophie", def: "tournant" },
+  { mot: "sphère", def: "sphère" },
+  { mot: "dactyle", def: "doigt" },
+  { mot: "phagie", def: "alimentation" },
+  { mot: "cère", def: "corne" },
+  { mot: "cyclique", def: "circularité" },
+  { mot: "glosse", def: "langue" },
+  { mot: "dynie", def: "énergie" },
+  { mot: "physique", def: "physique" },
+  { mot: "cycle", def: "cercle" },
+  { mot: "phasique", def: "dire" },
+  { mot: "plasme", def: "formé(e) de" },
+  { mot: "coque", def: "graine > bactérie" },
+  { mot: "typie", def: "empreinte" },
+  { mot: "biotique", def: "vie" },
+  { mot: "lâtrie", def: "serviteur > mercenaire > adoration" },
+  { mot: "ophtalmie", def: "oeil" },
+  { mot: "thérapeute", def: "médecin" },
+  { mot: "gastre", def: "ventre / estomac" },
+  { mot: "gastrique", def: "ventre / estomac" },
+  { mot: "malacie", def: "ramollissement" },
+  { mot: "mancien", def: "prédicteur" },
+  { mot: "mycète", def: "champignon" },
+  { mot: "glossie", def: "langue" },
+  { mot: "gnathie", def: "mâchoire" },
+  { mot: "plaste", def: "modeleur" },
+  { mot: "cardie", def: "cœur" },
+  { mot: "centrisme", def: "centrage" },
+  { mot: "diagnostic", def: "diagnostic" },
+  { mot: "lalie", def: "bavardage" },
+  { mot: "mèle", def: "membre" },
+  { mot: "pathe", def: "malade" },
+  { mot: "sexuel", def: "sexualité" },
+  { mot: "stasie", def: "arrêt" },
+  { mot: "flore", def: "fleur" },
+  { mot: "gale", def: "lait" },
+  { mot: "morphique", def: "forme" },
+  { mot: "andre", def: "homme > male" },
+  { mot: "lâtre", def: "serviteur > mercenaire > adorateur" },
+  { mot: "orexie", def: "faim" },
+  { mot: "pithèque", def: "singe" },
+  { mot: "cline", def: "inclinaison" },
+  { mot: "colore", def: "couleur" },
+  { mot: "mimie", def: "imitation" },
+  { mot: "pède", def: "pied" },
+  { mot: "plégique", def: "paralysie" },
+  { mot: "topie", def: "lieu" },
+  { mot: "andrie", def: "homme > male" },
+  { mot: "archie", def: "gouvernance" },
+  { mot: "cinèse", def: "mouvement" },
+  { mot: "lingue", def: "langue" },
+  { mot: "naute", def: "navigateur" },
+  { mot: "tope", def: "lieu" },
+  { mot: "tron", def: "machine" },
+  { mot: "calorique", def: "chaleur" },
+  { mot: "chronique", def: "temporel(le)" },
+  { mot: "claste", def: "casseur" },
+  { mot: "drame", def: "théâtre" },
+  { mot: "gyre", def: "qui tourne" },
+  { mot: "machie", def: "combat" },
+  { mot: "phorique", def: "porteur" },
+  { mot: "sophie", def: "sagesse" },
+  { mot: "statisme", def: "arrêt" },
+  { mot: "strophe", def: "tournant" },
+  { mot: "théisme", def: "divinité" },
+  { mot: "biote", def: "vie" },
+  { mot: "celle", def: "petit(e)" },
+  { mot: "cerque", def: "queue" },
+  { mot: "cope", def: "qui coupe" },
+  { mot: "cratisme", def: "gouvernance" },
+  { mot: "dromie", def: "course" },
+  { mot: "élastique", def: "élastique" },
+  { mot: "génaire", def: "agé(e)" },
+  { mot: "lophe", def: "crète" },
+  { mot: "loque", def: "parleur" },
+  { mot: "mobile", def: "véhicule" },
+  { mot: "pyge", def: "fesse" },
+  { mot: "rostre", def: "bec" },
+  { mot: "sexué", def: "sexué" },
+  { mot: "stable", def: "stable" },
+  { mot: "acanthe", def: "épine" },
+  { mot: "adelphe", def: "frère" },
+  { mot: "archique", def: "gouvernance" },
+  { mot: "arque", def: "gouverneur" },
+  { mot: "cène", def: "récent(e) > l'ère" },
+  { mot: "clasie", def: "cassure" },
+  { mot: "mastie", def: "sein" },
+  { mot: "mnésie", def: "mémoire" },
+  { mot: "phanie", def: "apparition" },
+  { mot: "phobique", def: "aversion" },
+  { mot: "physicien", def: "physicien" },
+  { mot: "plan", def: "plan(e)" },
+  { mot: "scaphe", def: "véhicule" },
+  { mot: "sténose", def: "rétrécissement" },
+  { mot: "bacter", def: "bactérie" },
+  { mot: "céphalique", def: "tête" },
+  { mot: "cyane", def: "bleu(e)" },
+  { mot: "dendron", def: "arbre" },
+  { mot: "duc", def: "conduit" },
+  { mot: "dynamisme", def: "mouvement" },
+  { mot: "gastrie", def: "ventre / estomac" },
+  { mot: "mnésique", def: "mémoire" },
+  { mot: "pète", def: "qui va vers" },
+  { mot: "phrène", def: "esprit" },
+  { mot: "plane", def: "plan(e)" },
+  { mot: "somnie", def: "sommeil" },
+  { mot: "adelphie", def: "frère" },
+  { mot: "algésique", def: "douleur" },
+  { mot: "arche", def: "gouverneur" },
+  { mot: "athlon", def: "sport" },
+  { mot: "barique", def: "pression" },
+  { mot: "chire", def: "main" },
+  { mot: "coccose", def: "graine > bactérie" },
+  { mot: "cosme", def: "univers" },
+  { mot: "cosmique", def: "universalité" },
+  { mot: "doxie", def: "opinion" },
+  { mot: "dyme", def: "double" },
+  { mot: "graphisme", def: "écriture" },
+  { mot: "lexique", def: "lecture" },
+  { mot: "loquie", def: "parole" },
+  { mot: "lysie", def: "décomposition" },
+  { mot: "nautique", def: "navigation" },
+  { mot: "nomisme", def: "loi" },
+  { mot: "sélène", def: "lune" },
+  { mot: "thanasie", def: "mort" },
+  { mot: "anthème", def: "fleur" },
+  { mot: "arcat", def: "gouvernement" },
+  { mot: "calorie", def: "chaleur" },
+  { mot: "kinèse", def: "déplacer" },
+  { mot: "mimétisme", def: "imitation" },
+  { mot: "pygie", def: "fesse" },
+  { mot: "rhize", def: "racine" },
+  { mot: "robot", def: "robot" },
+  { mot: "sophisme", def: "sagesse" },
+  { mot: "taphe", def: "tombeau" },
+  { mot: "tomisme", def: "découpe" },
+  { mot: "amniotique", def: "bassin" },
+  { mot: "archisme", def: "gouvernance" },
+  { mot: "céphalisme", def: "tête" },
+  { mot: "chirie", def: "main" },
+  { mot: "didacte", def: "enseignant" },
+  { mot: "didactique", def: "enseignement" },
+  { mot: "didactisme", def: "enseignement" },
+  { mot: "hydre", def: "eau" },
+  { mot: "nésie", def: "île" },
+  { mot: "oste", def: "os" },
+  { mot: "phatique", def: "dire" },
+  { mot: "phonisme", def: "voix" },
+  { mot: "phorisme", def: "porteur" },
+  { mot: "phyton", def: "végétal" },
+  { mot: "porose", def: "passage" },
+  { mot: "somatisme", def: "corps" },
+];
+
+function getPrefixe(n) {
+  return prefixes[(n - 1) % prefixes.length];
+}
+
+function getSuffixe(n) {
+  return suffixes[(n - 1) % suffixes.length];
+}
+
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function genererAuto() {
+  const pi = randInt(1, prefixes.length);
+  const si = randInt(1, suffixes.length);
+  const p = getPrefixe(pi);
+  const s = getSuffixe(si);
+
+  // Animation refresh
+  const motEl = document.getElementById('mot-display');
+  motEl.style.animation = 'none';
+  motEl.offsetHeight;
+  motEl.style.animation = '';
+
+  document.getElementById('mot-display').textContent = p.mot + s.mot;
+  document.getElementById('def-prefix').textContent = p.def;
+  document.getElementById('def-suffix').textContent = s.def;
+  document.getElementById('prefix-word').textContent = p.mot;
+  document.getElementById('prefix-def').textContent = p.def;
+  document.getElementById('suffix-word').textContent = s.mot;
+  document.getElementById('suffix-def').textContent = s.def;
+  document.getElementById('combo-1').textContent = p.def + ' ' + s.def;
+  document.getElementById('combo-2').textContent = 'ou : ' + s.def + ' ' + p.def;
+  
+  // Mise à jour du compteur HUD
+  document.getElementById('hud-count').textContent = `LOAD: ${prefixes.length}×${suffixes.length}`;
+}
+
+// Particules flottantes
+function createParticle() {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const colors = ['#00f5ff','#ff2d78','#39ff14','#ff6b00'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  const size = Math.random() * 3 + 1;
+  p.style.cssText = `
+    left: ${Math.random()*100}%;
+    width: ${size}px;
+    height: ${size}px;
+    background: ${color};
+    box-shadow: 0 0 ${size*2}px ${color};
+    animation-duration: ${Math.random()*8+6}s;
+    animation-delay: ${Math.random()*5}s;
+  `;
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 14000);
+}
+
+setInterval(createParticle, 1800);
+
+// Initialisation
+genererAuto();
+</script>
+
 </body>
 </html>
